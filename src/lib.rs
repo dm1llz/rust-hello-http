@@ -1,3 +1,8 @@
+#![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
+//! Library for creating a `ThreadPool`
+//!
+//! A ThreadPool can be used to execute commands on a specified number of threads
+
 use std::sync::Arc;
 use std::sync::mpsc;
 use std::sync::Mutex;
@@ -20,6 +25,10 @@ enum Message {
     Terminate,
 }
 
+/// ThreadPool struct which stores a sender to send the message containing the closure across the
+/// channel and a vector of worker threads that listen for the message so they can execute the
+/// closure
+#[derive(Debug)]
 pub struct ThreadPool {
     sender: mpsc::Sender<Message>,
     workers: Vec<Worker>,
@@ -48,6 +57,7 @@ impl ThreadPool {
         ThreadPool { sender, workers }
     }
 
+    /// Execute a closure when a thread becomes available
     pub fn execute<F>(&self, f: F)
         where
             F: FnOnce() + Send + 'static,
@@ -76,6 +86,7 @@ impl Drop for ThreadPool {
     }
 }
 
+#[derive(Debug)]
 struct Worker {
     id: usize,
     thread: Option<thread::JoinHandle<()>>,

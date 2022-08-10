@@ -22,7 +22,10 @@ fn main() {
 fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
 
-    stream.read(&mut buffer).unwrap();
+    match stream.read(&mut buffer) {
+        Ok(_) => println!("Received"),
+        Err(err) => println!("{}", err)
+    }
 
     let get = b"GET / HTTP/1.1\r\n";
     let sleep = b"GET /sleep HTTP/1.1\r\n";
@@ -44,6 +47,9 @@ fn handle_connection(mut stream: TcpStream) {
         contents
     );
 
-    stream.write(response.as_bytes()).unwrap();
+    match stream.write(response.as_bytes()) {
+        Ok(_) => println!("Sent"),
+        Err(err) => println!("{}", err)
+    };
     stream.flush().unwrap();
 }
